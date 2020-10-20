@@ -7,8 +7,8 @@ import Style from 'ol/style/Style';
 import CircleStyle from 'ol/style/Circle';
 import { buildFill, buildStroke, tryBuildTextStyle, evalFeature } from './ol-style-builders';
 import IconStyle from "ol/style/Icon";
-import * as shortid from "shortid";
 import { deg2rad } from '../utils/number';
+import { generateId } from '../utils/id-gen';
 
 function isDynamicStroke(stroke: IBasicStroke | undefined): boolean {
     if (!stroke) {
@@ -83,7 +83,7 @@ function buildStyleMap(pts: Style, lns: Style, pls: Style) {
         fill: cpls.getFill()
     });
     return {
-        id: shortid.generate(),
+        id: generateId(),
         Point: pts,
         MultiPoint: pts,
         LineString: lns,

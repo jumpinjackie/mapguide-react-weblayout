@@ -1,9 +1,9 @@
 import { UIWidget } from '../contracts/fusion';
 import { DefaultCommands } from './command';
-import * as shortid from "shortid";
 import { DefaultComponentNames } from './component';
 import { tr } from '../i18n';
 import { Dictionary } from '../common';
+import { generateId } from '../../utils/id-gen';
 
 /**
  * @hidden
@@ -123,7 +123,7 @@ export function convertWidget(widget: UIWidget, locale: string, noToolbarLabels:
         case "Maptip":
             return { icon: widget.ImageUrl, spriteClass: widget.ImageClass, command: DefaultCommands.MapTip, label: (noToolbarLabels ? null : widget.Label), tooltip: widget.Tooltip, parameters: widget.Extension };
         case "MapMenu":
-            return { icon: widget.ImageUrl, spriteClass: widget.ImageClass, label: (noToolbarLabels ? null : widget.Label), tooltip: widget.Tooltip, componentName: DefaultComponentNames.MapMenu, flyoutId: `${DefaultComponentNames.MapMenu}_${shortid.generate()}`, parameters: widget.Extension };
+            return { icon: widget.ImageUrl, spriteClass: widget.ImageClass, label: (noToolbarLabels ? null : widget.Label), tooltip: widget.Tooltip, componentName: DefaultComponentNames.MapMenu, flyoutId: `${DefaultComponentNames.MapMenu}_${generateId()}`, parameters: widget.Extension };
         case "Query":
             return { icon: widget.ImageUrl, spriteClass: widget.ImageClass, command: DefaultCommands.Query, label: (noToolbarLabels ? null : widget.Label), tooltip: widget.Tooltip, parameters: widget.Extension };
         case "QuickPlot":
@@ -152,7 +152,7 @@ export function convertWidget(widget: UIWidget, locale: string, noToolbarLabels:
         case "Measure":
             return { icon: widget.ImageUrl, spriteClass: widget.ImageClass, command: DefaultCommands.Measure, label: (noToolbarLabels ? null : widget.Label), tooltip: widget.Tooltip, parameters: widget.Extension };
         case "BasemapSwitcher":
-            return { icon: widget.ImageUrl, spriteClass: widget.ImageClass, label: (noToolbarLabels ? null : widget.Label), tooltip: widget.Tooltip, componentName: DefaultComponentNames.BaseMapSwitcher, flyoutId: `${DefaultComponentNames.BaseMapSwitcher}_${shortid.generate()}`, parameters: widget.Extension };
+            return { icon: widget.ImageUrl, spriteClass: widget.ImageClass, label: (noToolbarLabels ? null : widget.Label), tooltip: widget.Tooltip, componentName: DefaultComponentNames.BaseMapSwitcher, flyoutId: `${DefaultComponentNames.BaseMapSwitcher}_${generateId()}`, parameters: widget.Extension };
         case "InvokeScript":
             return { icon: widget.ImageUrl, spriteClass: widget.ImageClass, command: widget.Name, label: (noToolbarLabels ? null : widget.Label), tooltip: widget.Tooltip, parameters: widget.Extension };
         default:

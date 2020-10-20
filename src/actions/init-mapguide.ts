@@ -16,11 +16,11 @@ import { ViewerInitCommand } from './init-command';
 import { WebLayout, isInvokeURLCommand, isSearchCommand } from '../api/contracts/weblayout';
 import { ToolbarConf } from '../api/registry/command-spec';
 import { clearSessionStore, retrieveSelectionSetFromLocalStorage } from '../api/session-store';
-import * as shortid from 'shortid';
 import { WEBLAYOUT_CONTEXTMENU, WEBLAYOUT_TASKMENU, WEBLAYOUT_TOOLBAR } from "../constants";
 import { registerCommand } from '../api/registry/command';
 import { ensureParameters } from '../utils/url';
 import { assertIsDefined } from '../utils/assert';
+import { generateId } from '../utils/id-gen';
 
 export class MapGuideViewerInitCommand extends ViewerInitCommand<RuntimeMap> {
     private client: Client | undefined;
@@ -56,7 +56,7 @@ export class MapGuideViewerInitCommand extends ViewerInitCommand<RuntimeMap> {
         if (lastSlash >= 0 && lastDot >= 0 && lastDot > lastSlash) {
             return `${mapDef.substring(lastSlash + 1, lastDot)}`;
         } else {
-            return `Map_${shortid.generate()}`;
+            return `Map_${generateId()}`;
         }
     }
     private async initFromWebLayoutAsync(webLayout: WebLayout, session: string, sessionWasReused: boolean): Promise<IInitAppActionPayload> {

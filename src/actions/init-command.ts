@@ -12,10 +12,10 @@ import { warn, info } from '../utils/logger';
 import { DefaultCommands, registerCommand } from '../api/registry/command';
 import { tr, registerStringBundle, DEFAULT_LOCALE } from '../api/i18n';
 import { WEBLAYOUT_CONTEXTMENU, WEBLAYOUT_TASKMENU } from "../constants";
-import * as shortid from 'shortid';
 import { Client } from '../api/client';
 import { ActionType } from '../constants/actions';
 import { ensureParameters } from '../utils/url';
+import { generateId } from '../utils/id-gen';
 
 export interface IViewerInitCommand {
     attachClient(client: Client): void;
@@ -215,7 +215,7 @@ export abstract class ViewerInitCommand<TSubject> implements IViewerInitCommand 
                 for (const item of tbConf[key].items) {
                     //Special case: contextmenu is all inline
                     if (isFlyoutSpec(item) && key != WEBLAYOUT_CONTEXTMENU) {
-                        const flyoutId = `${item.label}_${shortid.generate()}`;
+                        const flyoutId = `${item.label}_${generateId()}`;
                         prepared.toolbars[key].items.push({
                             label: item.label,
                             tooltip: item.tooltip,

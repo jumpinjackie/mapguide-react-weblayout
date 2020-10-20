@@ -56,6 +56,7 @@
     "ismobilejs": "^1.1.1",
     "immutability-helper": "^3.1.1",
     "lodash.debounce": "^4.0.8",
+    "nanoid": "^3.1.12",
     "ol": "6.4.3",
     "papaparse": "^5.3.0",
     "proj4": "2.6.2",
@@ -70,7 +71,6 @@
     "redux": "^4.0.5",
     "redux-logger": "^4.0.0",
     "redux-thunk": "^2.3.0",
-    "shortid": "^2.2.15",
     "stickybits": "3.7.7",
     "tslib": "^2.0.3",
     "url-parse": "^1.4.7"
