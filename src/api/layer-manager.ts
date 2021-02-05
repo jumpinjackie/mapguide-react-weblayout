@@ -118,7 +118,7 @@ export class LayerManager implements ILayerManager {
                             break;
                         }
                     }
-                    if (bLoaded) {
+                    if (bLoaded && loadedType) {
                         resolve(loadedType);
                     } else {
                         reject(new Error(tr("ADD_LOCAL_FILE_LAYER_FAILURE", locale)));

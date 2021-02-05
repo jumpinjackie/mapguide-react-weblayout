@@ -254,8 +254,10 @@ export abstract class BaseMapProviderContext<TState extends IMapProviderState, T
                     mapCanvas.height = h;
                 } else {
                     const size = map.getSize();
-                    mapCanvas.width = size[0];
-                    mapCanvas.height = size[1];
+                    if (size) {
+                        mapCanvas.width = size[0];
+                        mapCanvas.height = size[1];
+                    }
                 }
                 const mapContext = mapCanvas.getContext('2d');
                 if (mapContext) {
@@ -518,9 +520,10 @@ export abstract class BaseMapProviderContext<TState extends IMapProviderState, T
         assertIsDefined(this._state.mapName);
         const activeLayerSet = this.getLayerSetGroup(this._state.mapName);
         assertIsDefined(activeLayerSet);
+        const size = this._map.getSize();
+        assertIsDefined(size);
         const mcsW = olExtent.getWidth(bounds);
         const mcsH = olExtent.getHeight(bounds);
-        const size = this._map.getSize();
         const devW = size[0];
         const devH = size[1];
         const metersPerPixel = 0.0254 / activeLayerSet.getDpi();
@@ -726,11 +729,13 @@ export abstract class BaseMapProviderContext<TState extends IMapProviderState, T
             const activeLayerSet = this.getLayerSetGroup(mapName);
             const layerMgr = this.getLayerManager(mapName);
             const res = this._map.getView().getResolution();
-            this._selectTooltip?.queryWmsFeatures(activeLayerSet, layerMgr, coord, res, {
-                getLocale: () => this._state.locale,
-                addFeatureToHighlight: (feat, bAppend) => this.addFeatureToHighlight(feat, bAppend),
-                getWmsRequestAugmentations: () => this._wmsQueryAugmentations[mapName] ?? {}
-            });
+            if (res) {
+                this._selectTooltip?.queryWmsFeatures(activeLayerSet, layerMgr, coord, res, {
+                    getLocale: () => this._state.locale,
+                    addFeatureToHighlight: (feat, bAppend) => this.addFeatureToHighlight(feat, bAppend),
+                    getWmsRequestAugmentations: () => this._wmsQueryAugmentations[mapName] ?? {}
+                });
+            }
         }
     }
     /**
@@ -781,7 +786,14 @@ export abstract class BaseMapProviderContext<TState extends IMapProviderState, T
             if (this._select && featureToLayerMap.length == 1) {
                 const [f, l] = featureToLayerMap[0];
                 if (isClusteredFeature(f) && getClusterSubFeatures(f).length > 1 && (l.get(LayerProperty.VECTOR_STYLE) as OLStyleMapSet)?.getClusterClickAction() == ClusterClickAction.ZoomToClusterExtents) {
-                    const zoomBounds = getClusterSubFeatures(f).reduce((bounds, currentFeatures) => olExtent.extend(bounds, currentFeatures.getGeometry().getExtent()), olExtent.createEmpty());
+                    const zoomBounds = getClusterSubFeatures(f).reduce((bounds, currentFeatures) => {
+                        const g = currentFeatures.getGeometry();
+                        if (g) {
+                            return olExtent.extend(bounds, g.getExtent());
+                        } else {
+                            return bounds;
+                        }
+                    }, olExtent.createEmpty());
                     this.zoomToExtent(zoomBounds);
                 } else {
                     this._select.getFeatures().push(f);
@@ -1011,8 +1023,11 @@ export abstract class BaseMapProviderContext<TState extends IMapProviderState, T
     }
     private onResize = (e: GenericEvent) => {
         if (this._map) {
-            const [w, h] = this._map.getSize();
-            this._comp?.onDispatch(mapResized(w, h));
+            const size = this._map.getSize();
+            if (size) {
+                const [w, h] = size;
+                this._comp?.onDispatch(mapResized(w, h));
+            }
         }
     }
     public scaleToResolution(scale: number): number {
@@ -1033,10 +1048,10 @@ export abstract class BaseMapProviderContext<TState extends IMapProviderState, T
         const ov = this.getOLView();
         const center = ov.getCenter();
         const resolution = ov.getResolution();
-        const scale = this.resolutionToScale(resolution);
+        const scale = this.resolutionToScale(resolution!);
         return {
-            x: center[0],
-            y: center[1],
+            x: center![0],
+            y: center![1],
             scale: scale,
             resolution: resolution
         };
@@ -1213,7 +1228,7 @@ export abstract class BaseMapProviderContext<TState extends IMapProviderState, T
         const ur = this._map.getCoordinateFromPixel([point[0] + ptBuffer, point[1] + ptBuffer]);
         return [ll[0], ll[1], ur[0], ur[1]];
     }
-    public getResolution(): number {
+    public getResolution(): number | undefined {
         assertIsDefined(this._map)
         return this._map.getView().getResolution();
     }

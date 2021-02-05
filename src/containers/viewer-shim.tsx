@@ -501,7 +501,10 @@ class FusionWidgetApiShim {
     pixToGeoMeasure(tolerance: number) { //Map
         const viewer = getViewer();
         if (viewer) {
-            return tolerance * viewer.getResolution();
+            const res = viewer.getResolution();
+            if (res) {
+                return tolerance * res;
+            }
         }
         return 0.000001; //Pull some random number
     }

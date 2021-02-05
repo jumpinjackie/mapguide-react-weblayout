@@ -34,8 +34,8 @@ import { useActiveMapState, useActiveMapSessionId, useActiveMapSelectableLayerNa
 import { useReduxDispatch } from './context';
 
 export function isMapGuideProviderState(arg: any): arg is IMapGuideProviderState {
-    return typeof(arg.agentUri) == 'string'
-        && typeof(arg.agentKind) == 'string';
+    return typeof (arg.agentUri) == 'string'
+        && typeof (arg.agentKind) == 'string';
 }
 
 function useMapGuideViewerState() {
@@ -641,10 +641,12 @@ export class MapGuideMapProviderContext extends BaseMapProviderContext<IMapGuide
         if (this._state.activeSelectedFeatureXml != nextState.activeSelectedFeatureXml) {
             if (this._map && nextState.map) {
                 const ms = this._map.getSize();
-                const view = this.getOLView();
-                const me: any = view.calculateExtent(ms);
-                const size = { w: ms[0], h: ms[1] };
-                this.showSelectedFeature(me, size, nextState.map, nextState.activeSelectedFeatureColor, nextState.activeSelectedFeatureXml);
+                if (ms) {
+                    const view = this.getOLView();
+                    const me: any = view.calculateExtent(ms);
+                    const size = { w: ms[0], h: ms[1] };
+                    this.showSelectedFeature(me, size, nextState.map, nextState.activeSelectedFeatureColor, nextState.activeSelectedFeatureXml);
+                }
             }
         }
 

@@ -205,7 +205,11 @@ export class OLStyleMapSet {
     }
     public evaluateStyle(feature: Feature<Geometry>) {
         try {
-            const gt: any = feature.getGeometry().getType();
+            const g = feature.getGeometry();
+            if (!g) {
+                return null;
+            }
+            const gt: any = g.getType();
             const filter = this.exprContext.evaluateFilter(feature);
             let matchingStyle: IOlStyleMap | DynamicStyleMap;
             const r = isClusteredFeature(feature) ? this.clusterRules : this.rules;

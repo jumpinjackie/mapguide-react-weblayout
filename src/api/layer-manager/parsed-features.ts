@@ -37,8 +37,10 @@ export class ParsedFeatures implements IParsedFeatures {
         if (dataProjection) {
             for (const f of this.features) {
                 const g = f.getGeometry();
-                const tg = g.transform(dataProjection, mapProjection)
-                f.setGeometry(tg);
+                if (g) {
+                    const tg = g.transform(dataProjection, mapProjection)
+                    f.setGeometry(tg);
+                }
             }
         }
         source.addFeatures(this.features);

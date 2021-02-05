@@ -1,12 +1,9 @@
 {
-    "inputFiles": ["./src/index.ts"],
-    "mode": "modules",
+    "entryPoints": ["./src/index.ts"],
     "theme": "./docs_dev/themes/typedoc-default",
     "readme": "./docs_dev/content/API_NPM.md",
     "excludePrivate": true,
     "excludeExternals": true,
-    "excludeNotExported": true,
-    "includeDeclarations": true,
     "includeVersion": true,
     "gaID": "UA-99064723-1",
     "tsconfig": "tsconfig.npmdoc.json",

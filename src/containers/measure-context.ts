@@ -25,7 +25,7 @@ const LAYER_NAME = "measure-layer";
 /**
  * @hidden
  */
-export interface MeasureSegment { 
+export interface MeasureSegment {
     segment: number;
     length: number;
 }
@@ -182,31 +182,34 @@ export class MeasureContext {
         let tooltipCoord = evt.coordinate;
 
         if (this.sketch) {
-            this.listener = this.sketch.getGeometry().on('change', (e: GenericEvent) => {
-                const geom = e.target;
-                let output: string;
-                if (geom instanceof Polygon) {
-                    const [o, total, segments] = this.formatArea(geom);
-                    output = o;
-                    if (this.callback) {
-                        this.callback.updateSegments("Area", total, segments);
+            const g = this.sketch.getGeometry();
+            if (g) {
+                this.listener = g.on('change', (e: GenericEvent) => {
+                    const geom = e.target;
+                    let output: string;
+                    if (geom instanceof Polygon) {
+                        const [o, total, segments] = this.formatArea(geom);
+                        output = o;
+                        if (this.callback) {
+                            this.callback.updateSegments("Area", total, segments);
+                        }
+                        tooltipCoord = geom.getInteriorPoint().getCoordinates();
+                    } else if (geom instanceof LineString) {
+                        const [o, total, segments] = this.formatLength(geom);
+                        output = o;
+                        if (this.callback) {
+                            this.callback.updateSegments("LineString", total, segments);
+                        }
+                        tooltipCoord = geom.getLastCoordinate();
+                    } else {
+                        output = "";
                     }
-                    tooltipCoord = geom.getInteriorPoint().getCoordinates();
-                } else if (geom instanceof LineString) {
-                    const [o, total, segments] = this.formatLength(geom);
-                    output = o;
-                    if (this.callback) {
-                        this.callback.updateSegments("LineString", total, segments);
+                    if (this.measureTooltipElement) {
+                        this.measureTooltipElement.innerHTML = output;
                     }
-                    tooltipCoord = geom.getLastCoordinate();
-                } else {
-                    output = "";
-                }
-                if (this.measureTooltipElement) {
-                    this.measureTooltipElement.innerHTML = output;
-                }
-                this.measureTooltip.setPosition(tooltipCoord);
-            });
+                    this.measureTooltip.setPosition(tooltipCoord);
+                });
+            }
         }
     }
     private onDrawEnd = () => {

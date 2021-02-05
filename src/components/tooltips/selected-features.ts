@@ -77,7 +77,7 @@ function defaultPopupContentRenderer(feat: Feature<Geometry>, locale?: string, p
         table += "</table>";
         return table
     };
-    const renderForSingle = (feature: Feature): [string, number, string|undefined] => {
+    const renderForSingle = (feature: Feature): [string, number, string | undefined] => {
         let linkFragment: string | undefined;
         let table = "<table class='selected-popup-single-properties-table'>";
         table += "<tbody>";
@@ -224,41 +224,43 @@ export class SelectedFeaturesTooltip {
             let url = source.getFeatureInfoUrl(coord, resolution, this.map.getView().getProjection(), {
                 'INFO_FORMAT': "application/json"
             });
-            const layerName = layer.get(LayerProperty.LAYER_NAME);
-            //Check if we have an augmentation for this
-            const augs = callback.getWmsRequestAugmentations();
-            if (augs[layerName]) {
-                url = augs[layerName](url);
-            }
-            const resp = await client.getText(url);
-            const json = JSON.parse(resp);
-            if (json.features?.length > 0) {
-                let srcProj: ProjectionLike = source.getProjection();
-                if (!srcProj) {
-                    const epsg = parseEpsgCodeFromCRS(json.crs?.properties?.name);
-                    if (epsg) {
-                        srcProj = `EPSG:${epsg}`;
+            if (url) {
+                const layerName = layer.get(LayerProperty.LAYER_NAME);
+                //Check if we have an augmentation for this
+                const augs = callback.getWmsRequestAugmentations();
+                if (augs[layerName]) {
+                    url = augs[layerName](url);
+                }
+                const resp = await client.getText(url);
+                const json = JSON.parse(resp);
+                if (json.features?.length > 0) {
+                    let srcProj: ProjectionLike = source.getProjection();
+                    if (!srcProj) {
+                        const epsg = parseEpsgCodeFromCRS(json.crs?.properties?.name);
+                        if (epsg) {
+                            srcProj = `EPSG:${epsg}`;
+                        }
                     }
+                    const features = format.readFeatures(resp, {
+                        dataProjection: srcProj,
+                        featureProjection: this.map.getView().getProjection()
+                    });
+                    this.featureTooltip.setPosition(coord);
+                    const popupConf: ISelectedFeaturePopupTemplateConfiguration | undefined = layer.get(LayerProperty.SELECTED_POPUP_CONFIGURATION);
+                    const html = this.generateFeatureHtml(layerName, features[0], callback.getLocale(), popupConf);
+                    callback.addFeatureToHighlight(features[0], false);
+                    selected++;
+                    this.featureTooltipElement.innerHTML = html;
+                    stickybits(".selected-popup-cluster-table th");
+                    this.closerEl = document.getElementById("feat-popup-closer");
+                    this.setPopupCloseHandler();
+                    if (html == "") {
+                        this.featureTooltipElement.classList.add("tooltip-hidden");
+                    } else {
+                        this.featureTooltipElement.classList.remove("tooltip-hidden");
+                    }
+                    return;
                 }
-                const features = format.readFeatures(resp, {
-                    dataProjection: srcProj,
-                    featureProjection: this.map.getView().getProjection()
-                });
-                this.featureTooltip.setPosition(coord);
-                const popupConf: ISelectedFeaturePopupTemplateConfiguration | undefined = layer.get(LayerProperty.SELECTED_POPUP_CONFIGURATION);
-                const html = this.generateFeatureHtml(layerName, features[0], callback.getLocale(), popupConf);
-                callback.addFeatureToHighlight(features[0], false);
-                selected++;
-                this.featureTooltipElement.innerHTML = html;
-                stickybits(".selected-popup-cluster-table th");
-                this.closerEl = document.getElementById("feat-popup-closer");
-                this.setPopupCloseHandler();
-                if (html == "") {
-                    this.featureTooltipElement.classList.add("tooltip-hidden");
-                } else {
-                    this.featureTooltipElement.classList.remove("tooltip-hidden");
-                }
-                return;
             }
         }
         // Clear if there was no selection made

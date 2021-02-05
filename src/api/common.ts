@@ -852,7 +852,7 @@ export interface IMapViewer {
      *
      * @memberof IMapViewer
      */
-    getResolution(): number;
+    getResolution(): number | undefined;
     /**
      * Gets the resolution for the given scale
      *
